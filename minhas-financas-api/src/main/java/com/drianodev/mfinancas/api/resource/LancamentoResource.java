@@ -34,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class LancamentoResource {
 
-	private final LancamentoService service;
+	private final LancamentoService lancamentoService;
 	private final UsuarioService usuarioService;
 
 	@GetMapping
@@ -57,7 +57,7 @@ public class LancamentoResource {
 		} else {
 			lancamentoFiltro.setUsuario(usuario.get());
 		}
-		List<Lancamento> lancamentos = service.buscar(lancamentoFiltro);
+		List<Lancamento> lancamentos = lancamentoService.buscar(lancamentoFiltro);
 
 		List<Lancamento> lancamentosOrdenados = lancamentos.stream()
 				.sorted(Comparator.comparing(Lancamento::getAno).reversed()
@@ -69,7 +69,7 @@ public class LancamentoResource {
 	
 	@GetMapping("{id}")
 	public ResponseEntity obterLancamento(@PathVariable("id") Long id) {
-		return service.obterPorId(id).
+		return lancamentoService.obterPorId(id).
 				map( lancamento -> new ResponseEntity(converter(lancamento)
 						,HttpStatus.OK ))
 				.orElseGet(() -> new ResponseEntity(HttpStatus.NOT_FOUND));
@@ -79,7 +79,7 @@ public class LancamentoResource {
 	public ResponseEntity salvar(@RequestBody LancamentoDTO dto) {
 		try {
 			Lancamento entidade = converter(dto);
-			entidade = service.salvar(entidade);
+			entidade = lancamentoService.salvar(entidade);
 			return new ResponseEntity(entidade, HttpStatus.CREATED);
 		} catch (RegraDeNegocioException e) {
 			return ResponseEntity.badRequest()
@@ -91,11 +91,11 @@ public class LancamentoResource {
 	@PutMapping("{id}")
 	public ResponseEntity atualizar(@PathVariable("id") Long id, @RequestBody LancamentoDTO dto) {
 
-		return service.obterPorId(id).map(entity -> {
+		return lancamentoService.obterPorId(id).map(entity -> {
 			try {
 				Lancamento lancamento = converter(dto);
 				lancamento.setId(entity.getId());
-				service.atualizar(lancamento);
+				lancamentoService.atualizar(lancamento);
 				return ResponseEntity.ok(lancamento);
 			} catch (RegraDeNegocioException e) {
 				return ResponseEntity.badRequest()
@@ -107,14 +107,14 @@ public class LancamentoResource {
 
 	@PutMapping("{id}/atualiza-status")
 	public ResponseEntity atualizarStatus(@PathVariable("id") Long id, @RequestBody AtualizaStatusDTO dto) {
-		return service.obterPorId(id).map(entity -> {
+		return lancamentoService.obterPorId(id).map(entity -> {
 			StatusLancamento statusSelecionado = StatusLancamento.valueOf(dto.getStatus());
 			if (statusSelecionado == null) {
 				return ResponseEntity.badRequest().body("Não foi possivel atualizar.");
 			}
 
 			entity.setStatus(statusSelecionado);
-			service.atualizar(entity);
+			lancamentoService.atualizar(entity);
 			return ResponseEntity.ok(entity);
 		}).orElseGet(() -> new ResponseEntity("Lancamento não encontrado na base de dados", HttpStatus.BAD_REQUEST));
 
@@ -122,8 +122,8 @@ public class LancamentoResource {
 
 	@DeleteMapping("{id}")
 	public ResponseEntity deletar(@PathVariable("id") Long id) {
-		return service.obterPorId(id).map(entidade -> {
-			service.deletar(entidade);
+		return lancamentoService.obterPorId(id).map(entidade -> {
+			lancamentoService.deletar(entidade);
 			return new ResponseEntity(HttpStatus.NO_CONTENT);
 		}).orElseGet(() -> new ResponseEntity("Lancamento não encontrado na base de dados",
 				HttpStatus.BAD_REQUEST));

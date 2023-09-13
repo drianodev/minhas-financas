@@ -5,6 +5,7 @@ import Home from '../views/Home';
 import ConsultaLancamento from '../views/ConsultaLancamento';
 import CadastroLancamento from '../views/CadastroLancamento';
 import RoutePrivate from './RoutePrivate';
+import ConfiguracoesConta from './../views/ConfiguracoesConta';
 
 function rotas() {
 
@@ -32,6 +33,11 @@ function rotas() {
         {
             path: '/cadastro-lancamento',
             component: <CadastroLancamento />,
+            isPrivate: true
+        },
+        {
+            path: '/configuracoes-conta',
+            component: <ConfiguracoesConta />,
             isPrivate: true
         },
     ]

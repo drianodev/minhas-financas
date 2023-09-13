@@ -56,6 +56,13 @@ function Navbar() {
       render: usuarioAutenticado()
     },
     {
+      descricao: 'Configurações Conta',
+      linkTo: '/configuracoes-conta', 
+      onClick: '', 
+      icon: '', 
+      render: usuarioAutenticado()
+    },
+    {
       descricao: 'Sair',
       linkTo: '/',
       onClick: logout,

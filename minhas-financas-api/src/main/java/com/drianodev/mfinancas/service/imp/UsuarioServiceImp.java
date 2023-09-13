@@ -2,6 +2,8 @@ package com.drianodev.mfinancas.service.imp;
 
 import java.util.Optional;
 
+import com.drianodev.mfinancas.exceptions.UsuarioNaoEncontradoException;
+import com.drianodev.mfinancas.exceptions.RegraDeNegocioException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,16 +16,16 @@ import com.drianodev.mfinancas.service.UsuarioService;
 @Service
 public class UsuarioServiceImp implements UsuarioService {
 	
-	private UsuarioRepository repository;
+	private UsuarioRepository usuarioRepository;
 	
-	public UsuarioServiceImp(UsuarioRepository repository) {
+	public UsuarioServiceImp(UsuarioRepository usuarioRepository) {
 		super();
-		this.repository = repository;
+		this.usuarioRepository = usuarioRepository;
 	}
 
 	@Override
 	public Usuario autenticar(String email, String senha) {
-		Optional<Usuario> usuario = repository.findByEmail(email);
+		Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
 		
 		if(!usuario.isPresent()) {
 			throw new ErroAutenticacaoException(("Usuario não encontrado"));
@@ -39,12 +41,12 @@ public class UsuarioServiceImp implements UsuarioService {
 	@Transactional
 	public Usuario salvarUsuario(Usuario usuario) {
 		validarEmail(usuario.getEmail());
-		return repository.save(usuario);
+		return usuarioRepository.save(usuario);
 	}
 
 	@Override
 	public void validarEmail(String email) {
-		boolean existeEmail = repository.existsByEmail(email);
+		boolean existeEmail = usuarioRepository.existsByEmail(email);
 		
 		if(existeEmail) {
 			throw new ErroAutenticacaoException(("Email já cadastrado"));
@@ -54,9 +56,26 @@ public class UsuarioServiceImp implements UsuarioService {
 
 	@Override
 	public Optional<Usuario> obterPorId(Long id) {
-		return repository.findById(id);
+		return usuarioRepository.findById(id);
 	}
-	
-	
 
+	@Override
+	@Transactional
+	public Usuario editarUsuario(Usuario usuario) {
+		if (usuario == null || usuario.getId() == null) {
+			throw new RegraDeNegocioException("Usuário inválido.");
+		}
+//		validarEmail(usuario.getEmail());
+		return usuarioRepository.save(usuario);
+	}
+
+	@Override
+	@Transactional
+	public void excluirUsuario(Long id) {
+		Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+		if (!usuarioOpt.isPresent()) {
+			throw new UsuarioNaoEncontradoException("Usuário não encontrado com o ID: " + id);
+		}
+		usuarioRepository.delete(usuarioOpt.get());
+	}
 }

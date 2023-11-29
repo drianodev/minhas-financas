@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -23,9 +24,9 @@ import com.drianodev.mfinancas.model.enums.TipoLancamento;
 public class LancamentoServiceImp implements LancamentoService {
 
 	private LancamentoRepository repository;
-	
+
+	@Autowired
 	public LancamentoServiceImp(LancamentoRepository repository) {
-		super();
 		this.repository = repository;
 	}
 

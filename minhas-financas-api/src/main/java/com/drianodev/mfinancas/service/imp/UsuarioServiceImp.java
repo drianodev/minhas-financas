@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.drianodev.mfinancas.exceptions.UsuarioNaoEncontradoException;
 import com.drianodev.mfinancas.exceptions.RegraDeNegocioException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +18,9 @@ import com.drianodev.mfinancas.service.UsuarioService;
 public class UsuarioServiceImp implements UsuarioService {
 	
 	private UsuarioRepository usuarioRepository;
-	
+
+	@Autowired
 	public UsuarioServiceImp(UsuarioRepository usuarioRepository) {
-		super();
 		this.usuarioRepository = usuarioRepository;
 	}
 

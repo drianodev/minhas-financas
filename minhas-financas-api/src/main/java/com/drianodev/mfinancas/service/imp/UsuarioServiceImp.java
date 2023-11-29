@@ -13,7 +13,6 @@ import com.drianodev.mfinancas.model.entity.Usuario;
 import com.drianodev.mfinancas.model.repository.UsuarioRepository;
 import com.drianodev.mfinancas.service.UsuarioService;
 
-
 @Service
 public class UsuarioServiceImp implements UsuarioService {
 	

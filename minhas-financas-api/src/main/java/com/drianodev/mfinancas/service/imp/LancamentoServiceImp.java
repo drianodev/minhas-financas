@@ -1,10 +1,12 @@
 package com.drianodev.mfinancas.service.imp;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.drianodev.mfinancas.service.validacao.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -19,11 +21,12 @@ import com.drianodev.mfinancas.model.repository.LancamentoRepository;
 import com.drianodev.mfinancas.service.LancamentoService;
 import com.drianodev.mfinancas.model.enums.TipoLancamento;
 
-
 @Service
 public class LancamentoServiceImp implements LancamentoService {
 
 	private LancamentoRepository repository;
+
+	private ValidacaoStrategy validacaoStrategy;
 
 	@Autowired
 	public LancamentoServiceImp(LancamentoRepository repository) {
@@ -34,7 +37,15 @@ public class LancamentoServiceImp implements LancamentoService {
 	@Transactional
 	public Lancamento salvar(Lancamento lancamento) {
 		lancamento.setStatus(StatusLancamento.PENDENTE);
-		validar(lancamento);
+		List<ValidacaoStrategy> estrategiasDeValidacao = Arrays.asList(
+				new ValidacaoDescricao(),
+				new ValidacaoMes(),
+				new ValidacaoAno(),
+				new ValidacaoUsuario(),
+				new ValidacaoValor(),
+				new ValidacaoTipo()
+		);
+		validar(lancamento, estrategiasDeValidacao);
 		return repository.save(lancamento);
 	}
 
@@ -66,28 +77,15 @@ public class LancamentoServiceImp implements LancamentoService {
 		
 	}
 
+	public void setValidacaoStrategy(ValidacaoStrategy validacaoStrategy) {
+		this.validacaoStrategy = validacaoStrategy;
+	}
+
 	@Override
-	public void validar(Lancamento lancamento) {
-		if(lancamento.getDescricao() == null || lancamento.getDescricao().trim().equals("")) {
-			throw new RegraDeNegocioException(("Digite uma Descrição!"));
+	public void validar(Lancamento lancamento, List<ValidacaoStrategy> estrategias) {
+		for (ValidacaoStrategy estrategia : estrategias) {
+			estrategia.validar(lancamento);
 		}
-		
-		if(lancamento.getMes() == null || lancamento.getMes() < 1 || lancamento.getMes() > 12) {
-			throw new RegraDeNegocioException(("Digite um Mês válido!"));
-		}
-		if(lancamento.getAno() == null || lancamento.getAno().toString().length() != 4) {
-			throw new RegraDeNegocioException(("Digite um Ano válido!"));
-		}
-		if(lancamento.getUsuario() == null || lancamento.getUsuario().getId() == null) {
-			throw new RegraDeNegocioException(("Usuário inválido !"));
-		}
-		if(lancamento.getValor() == null || lancamento.getValor().compareTo(BigDecimal.ZERO) < 1) {
-			throw new RegraDeNegocioException(("Digite um Valor válido!"));
-		}
-		if(lancamento.getTipo() == null) {
-			throw new RegraDeNegocioException(("Informe um tipo de lancamento."));
-		}
-		
 	}
 
 	@Override

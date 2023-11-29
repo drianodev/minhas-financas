@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import com.drianodev.mfinancas.service.validacao.ValidacaoStrategy;
 import org.springframework.stereotype.Service;
 
 import com.drianodev.mfinancas.model.entity.Lancamento;
@@ -22,7 +23,7 @@ public interface LancamentoService {
 	
 	void atualizarStatus(Lancamento lancamento, StatusLancamento status);
 	
-	void validar(Lancamento lancamento);
+	void validar(Lancamento lancamento, List<ValidacaoStrategy> estrategias);
 	
 	Optional<Lancamento> obterPorId(Long id);
 	
